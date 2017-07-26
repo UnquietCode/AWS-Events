@@ -25,30 +25,32 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   # -------------------------------------------
-  # 
-  # CloudWatchReceiver:
-  #   Type: SNS::Topic
-  #   Properties:
-  #     Name: Recieve_CloudWatch2
-  # 
-  # CloudWatchHandler:
-  #   Type: AWS::Lambda::Function
-  #   Properties: 
-  #     Code: components/
-  #     Description: handler for CloudWatch events
-  #     FunctionName: Handle_CloudWatch
-  #     Handler: handlers/Handle_Watch.handler
-  #     Role: !Ref LambdaExecutionRole
-  #     Runtime: python3.6
-  #     MemorySize: 128
-  #     Timeout: 10
-  # 
-  # CloudWatchSubscription:
-  #   Type: AWS::SNS::Subscription
-  #   Properties:
-  #     Protocol: lambda
-  #     Endpoint: !Ref CloudWatchHandler
-  #     TopicArn: !Ref CloudWatchReceiver
+  
+  CloudWatchHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: components/
+      Description: handler for CloudWatch events
+      FunctionName: Handle_CloudWatch
+      Handler: handlers/Handle_Watch.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 10
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+
+  CloudWatchReceiver:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Receive_CloudWatch
+      Subscription:
+        - Protocol: lambda
+          Endpoint:
+            Fn::GetAtt:
+              - CloudWatchHandler
+              - Arn
 
   # -------------------------------------------
   
