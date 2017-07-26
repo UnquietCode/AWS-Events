@@ -24,12 +24,17 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
+  EventsReceiver:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Receive_Events
+
   # -------------------------------------------
   
   CloudWatchHandler:
     Type: AWS::Lambda::Function
     Properties:
-      Code: components/
+      Code: aws_events/
       Description: handler for CloudWatch events
       FunctionName: Handle_CloudWatch
       Handler: handlers/Handle_CloudWatch.handler
@@ -57,10 +62,10 @@ Resources:
   CloudFormationHandler:
     Type: AWS::Lambda::Function
     Properties:
-      Code: components/
-      Description: handler for CloudFormation events
+      Code: aws_events/
+      Description: handler for CloudFormation stack events
       FunctionName: Handle_CloudFormation
-      Handler: handlers/Handle_Formation.handler
+      Handler: handlers/Handle_CloudFormation.handler
       Runtime: python3.6
       MemorySize: 128
       Timeout: 10
