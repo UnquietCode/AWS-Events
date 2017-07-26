@@ -1,3 +1,9 @@
+from utils import publish_event
+
 
 def handler(event, context):
-    return 'OK'
+    publish_event(
+        source='CloudWatch',
+        subject='SUBJECTT',
+        message='MESSAGEE',
+    )

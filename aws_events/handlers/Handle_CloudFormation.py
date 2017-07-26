@@ -7,5 +7,3 @@ def handler(event, context):
         subject='SUBJECTT',
         message='MESSAGEE',
     )
-    
-    return 'OK'

@@ -95,9 +95,31 @@ Resources:
               
   # -------------------------------------------
   
-  # RDS_Receiver
-  # RDS_Handler
-  # RDS_Subscription
+  RDSHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: handler for RDS events
+      FunctionName: Handle_RDS
+      Handler: handlers/Handle_RDS.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 10
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+
+  CloudWatchReceiver:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Receive_RDS
+      Subscription:
+        - Protocol: lambda
+          Endpoint:
+            Fn::GetAtt:
+              - RDSHandler
+              - Arn
   
   # -------------------------------------------
   

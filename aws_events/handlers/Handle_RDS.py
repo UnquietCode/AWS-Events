@@ -1,3 +1,9 @@
+from utils import publish_event
+
 
 def handler(event, context):
-    return 'OK'
+    publish_event(
+        source='RDS',
+        subject='SUBJECTT',
+        message='MESSAGEE',
+    )
