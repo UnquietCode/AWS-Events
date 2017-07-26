@@ -1,4 +1,4 @@
-from aws_events.utils import Event, publish_event
+from utils import publish_event
 
 
 def handler(event, context):

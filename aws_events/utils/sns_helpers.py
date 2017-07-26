@@ -14,7 +14,7 @@ def publish_event(source, subject=None, message=None, data=None):
         'default': message,
         'email': message,
         'sms': subject,
-        'json': json.dumps({
+        'https': json.dumps({
             'source': source,
             'subject': subject,
             'message': message,
