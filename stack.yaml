@@ -64,6 +64,17 @@ Resources:
             Fn::GetAtt:
               - CloudWatchHandler
               - Arn
+              
+  CloudWatchPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref CloudWatchReceiver
+      FunctionName:
+        Fn::GetAtt:
+          - CloudWatchHandler
+          - Arn
 
   # -------------------------------------------
 
@@ -92,7 +103,18 @@ Resources:
             Fn::GetAtt:
               - CloudFormationHandler
               - Arn
-              
+
+  CloudFormationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref CloudFormationReceiver
+      FunctionName:
+        Fn::GetAtt:
+          - CloudFormationHandler
+          - Arn
+
   # -------------------------------------------
   
   RDSHandler:
@@ -110,7 +132,7 @@ Resources:
           - LambdaExecutionRole
           - Arn
 
-  CloudWatchReceiver:
+  RDSReceiver:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: Receive_RDS
@@ -120,7 +142,18 @@ Resources:
             Fn::GetAtt:
               - RDSHandler
               - Arn
-  
+                  
+  RDSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref RDSReceiver
+      FunctionName:
+        Fn::GetAtt:
+          - RDSHandler
+          - Arn
+
   # -------------------------------------------
   
   # Email_Notifier:
