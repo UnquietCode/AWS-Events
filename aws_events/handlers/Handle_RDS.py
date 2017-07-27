@@ -3,17 +3,18 @@ from utils import publish_event
 
 
 def handler(event, context):
-    message_content = event['Records'][0]['Sns']
-    message_data = json.loads(message_content['Message'])
+    message_data = json.loads(event['Records'][0]['Sns']['Message'])
     print(message_data)
 
     event_message = message_data.get('Event Message', '')
     database_name = message_data['Source ID']
     database_url = message_data['Identifier Link']
     
-    eventID = message.get('Event ID', '').strip()
+    eventID = message_data.get('Event ID', '').strip()
     last_hash = eventID.rfind('#')
-    event_name = eventID[lastHash+1, -1] if last_hash > 0 else '???'
+    event_name = eventID[last_hash+1:] if last_hash > 0 else '???'
+    
+    subject = "Database Event - {}".format(database_name)
     
     message = "{}\n{}\n\nSee {} for more information.".format(
         event_message,
@@ -23,7 +24,7 @@ def handler(event, context):
 
     publish_event(
         source='RDS',
-        subject='Database Event',
+        subject=subject,
         message=message,
         data={
             'event_name': event_name,
