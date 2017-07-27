@@ -10,7 +10,7 @@ def handler(event, context):
     subject = message_data['Event Message']
     subject = subject or message_content.get('Subject', 'RDS Event')
     
-    message = "Database '{}' -- {}\n{}\n\nSee {} for more information.".format(
+    message = "database '{}' -- {}\n{}\n\nSee {} for more information.".format(
         message_data['Source ID'],
         message_data['Event Message'],
         message_data['Identifier Link'],
