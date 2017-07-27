@@ -3,7 +3,7 @@ from utils import publish_event
 
 
 def handler(event, context):
-    message_content = event['Records'][0]["Sns"]
+    message_content = event['Records'][0]['Sns']
     message_data = json.loads(message_content['Message'])
     subject = message_content.get('Subject', '')
     
