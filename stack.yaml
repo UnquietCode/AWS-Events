@@ -156,5 +156,20 @@ Resources:
 
   # -------------------------------------------
   
-  # Email_Notifier:
+  SlackNotifier:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: notifier for Slack
+      FunctionName: Notify_Slack
+      Handler: notifiers/Notify_Slack.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 20
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+  
+  # EmailNotifier:
     # Type: Lambda

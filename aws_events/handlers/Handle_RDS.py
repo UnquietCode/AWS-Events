@@ -7,19 +7,27 @@ def handler(event, context):
     message_data = json.loads(message_content['Message'])
     print(message_data)
 
-    subject = message_data['Event Message']
-    subject = subject or message_content.get('Subject', 'RDS Event')
+    event_message = message_data.get('Event Message', '')
+    database_name = message_data['Source ID']
+    database_url = message_data['Identifier Link']
     
-    message = "database '{}' -- {}\n{}\n\nSee {} for more information.".format(
-        message_data['Source ID'],
-        message_data['Event Message'],
-        message_data['Identifier Link'],
-        message_data['Event ID'],
+    eventID = message.get('Event ID', '').strip()
+    last_hash = eventID.rfind('#')
+    event_name = eventID[lastHash+1, -1] if last_hash > 0 else '???'
+    
+    message = "{}\n{}\n\nSee {} for more information.".format(
+        event_message,
+        database_url,
+        eventID,
     )
-    
+
     publish_event(
         source='RDS',
-        subject=subject,
+        subject='Database Event',
         message=message,
-        data=message_data,
+        data={
+            'event_name': event_name,
+            'database_name': database_name,
+            'details': message_data
+        }
     )
