@@ -7,8 +7,8 @@ def handler(event, context):
     message_data = json.loads(message_content['Message'])
     subject = message_content.get('Subject', '')
     
-    message = "Metric '{}' is in state '{}'".format(
-        message_data['Trigger']['MetricName'],
+    message = "Alarm '{}' is in state '{}'".format(
+        message_data['AlarmName'],
         message_data['NewStateValue'],
     )
     
@@ -16,5 +16,9 @@ def handler(event, context):
         source='CloudWatch',
         subject=subject,
         message=message,
-        data=message_data,
+        data={
+            'alarm_name': message_data['AlarmName'],
+            'alarm_state': message_data['NewStateValue'],
+            'details': message_data,
+        }
     )
