@@ -1,7 +1,10 @@
+import os
 import json
+
 from utils import post_json
 
-URL = "https://hooks.slack.com/services/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"
+# grab the webhook URL from the environment
+URL = os.environ['SlackURL']
 
 
 def notify_channel(channel, name, icon, text, data):
@@ -16,11 +19,14 @@ def notify_channel(channel, name, icon, text, data):
     data = data or {}
     
     for key, value in data.items():
+        data_string = json.dumps(value, indent=2)
+        data_string = "```\n{}\n```".format(data_string)
+        
         attachments.append({
             'title': key,
             'fallback': key,
             'color': 'warning',
-            'text': "```\n{}\n```".format(json.dumps(value)),
+            'text': data_string,
             'mrkdwn_in': ['text'],
         })
     
