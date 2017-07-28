@@ -2,7 +2,8 @@ import re
 from utils import publish_event
 
 IGNORED_STATUSES = [
-    'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS'
+    'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
+    'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS',
 ]
 
 def parse_message(message):

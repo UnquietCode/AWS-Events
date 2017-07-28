@@ -4,9 +4,15 @@ Description: AWS Events Stack
 # -------------------------------------------
 
 Parameters:
+
   SlackURL:
     Type: String
     Description: webhook URL for posting events to Slack
+    Default: ""
+
+  EmailSenderAddress:
+    Type: String
+    Description: address to use for sending emails
     Default: ""
 
 # -------------------------------------------
@@ -35,6 +41,16 @@ Resources:
               Effect: Allow
               Action: SNS:Publish
               Resource: !Ref EventsReceiver
+              
+        - PolicyName: SES_Send-Emails
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Effect: Allow
+              Action:
+                - SES:SendEmail
+                - SES:SendRawEmail
+              Resource: '*'
 
   EventsReceiver:
     Type: AWS::SNS::Topic
@@ -178,5 +194,20 @@ Resources:
         Variables:
           SlackURL: !Ref SlackURL
   
-  # EmailNotifier:
-    # Type: Lambda
+  EmailNotifier:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: notifier for Email
+      FunctionName: Notify_Email
+      Handler: notifiers/Notify_Email.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 20
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Environment:
+        Variables:
+          SenderEmailAddress: !Ref EmailSenderAddress

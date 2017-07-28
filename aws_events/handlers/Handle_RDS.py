@@ -16,11 +16,13 @@ def handler(event, context):
     
     subject = "Database Event - {}".format(database_name)
     
-    message = "{}\n{}\n\nSee {} for more information.".format(
+    message = "{}\n{}".format(
         event_message,
         database_url,
-        eventID,
     )
+    
+    if eventID:
+        message = message + "\n\nSee {} for more information.".format(eventID)
 
     publish_event(
         source='RDS',
