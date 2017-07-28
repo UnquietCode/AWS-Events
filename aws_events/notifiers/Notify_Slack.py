@@ -43,6 +43,7 @@ def notify_channel(channel, name, icon, text, data):
 def handler(event, context):
     print(event)
     
+    # allow one or many channels, but not both
     if 'channel' in event and 'channels' in event:
         raise Exception('provide one or many channels, but not both')
     

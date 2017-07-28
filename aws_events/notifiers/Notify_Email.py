@@ -1,5 +1,5 @@
 import os
-import boto3
+import json
 
 from utils.ses_helpers import send_email
 
@@ -11,6 +11,7 @@ SenderEmailAddress = os.environ['SenderEmailAddress']
 def handler(event, context):
     print(event)
     
+    # allow one or recipients, but not both
     if 'recipient' in event and 'recipients' in event:
         raise Exception('provide one or many recipients, but not both')
     
@@ -21,17 +22,19 @@ def handler(event, context):
     
     subject = event['subject']
     text = event['text']
-    # html = event.get('html')
     data = event.get('data', {})
 
-    sections = ""
+    # build some html
+    sections = []
 
     for key, value in data.items():
         data_string = json.dumps(value, indent=2)
-        html_string = "<h2>{}</h2><pre>{}</pre>".format(key, data_string)
-        sections = sections + "\n" + html_string
+        html_string = "<h3>{}</h3><pre>{}</pre>".format(key, data_string)
+        sections.append(html_string)
     
-    html = "<html><body><p>{}</p>{}</body></html>".format(text, sections)
+    html = "<html><body>\n<p>{}</p>\n{}</body></html>".format(
+        text, '\n'.join(sections)
+    )
 
     send_email(
         sender=SenderEmailAddress,
