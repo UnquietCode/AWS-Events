@@ -1,10 +1,6 @@
 import re
 from utils import publish_event
 
-IGNORED_STATUSES = [
-    'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
-    'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS',
-]
 
 def parse_message(message):
     data = {}
@@ -29,11 +25,6 @@ def handler(event, context):
 
     status = message_data['ResourceStatus']
     
-    # skip statuses we don't care about
-    if status in IGNORED_STATUSES:
-        print("skipping ignored status '{}'".format(status))
-        return
-    
     message = "Stack '{}' has entered state '{}'.".format(
         message_data['LogicalResourceId'],
         status,
@@ -43,5 +34,8 @@ def handler(event, context):
         source='CloudFormation',
         subject='CloudFormation Event',
         message=message,
-        data=message_data,
+        data={
+            'status': status,
+            'details': message_data,
+        }
     )
