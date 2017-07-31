@@ -28,6 +28,7 @@ def handler(event, context):
         subject=subject,
         message=message,
         data={
+            'event_name': event_name,
             'cache_cluster': event_source,
             'details': message_data,
         }
