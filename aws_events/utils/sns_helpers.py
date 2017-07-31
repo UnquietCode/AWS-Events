@@ -31,3 +31,36 @@ def publish_event(source, subject=None, message=None, data=None):
         Message=message_data,
         MessageStructure='json',
     )
+    
+    
+def send_sms(sender, recipients, text):
+    last_exception = None
+    
+    for recipient in recipients:
+        try:
+            sns.publish(
+                PhoneNumber=recipient,
+                Message=text,
+                MessageAttributes={
+                    'AWS.SNS.SMS.SenderID': {
+                        'DataType': 'String',
+                        'StringValue': sender or 'AWS'
+                    },
+                    'AWS.SNS.SMS.SMSType': {
+                        'DataType': 'String',
+                        'StringValue': 'Transactional'
+                    },
+                    'AWS.SNS.SMS.MaxPrice': {
+                        'DataType': 'Number',
+                        'StringValue': '0.10'
+                    }
+                }
+            )
+        except Exception as e:
+            print(e)
+            last_exception = e
+    
+    if len(recipients) <= 1:
+        if last_exception is not None:
+            raise last_exception
+        

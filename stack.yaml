@@ -15,6 +15,11 @@ Parameters:
     Description: address to use for sending emails
     Default: ""
 
+  SenderPhoneID:
+    Type: String
+    Description: address to use for sending texts
+    Default: ""
+
 # -------------------------------------------
 
 Resources:
@@ -40,7 +45,7 @@ Resources:
             Statement:
               Effect: Allow
               Action: SNS:Publish
-              Resource: !Ref EventsReceiver
+              Resource: '*'
               
         - PolicyName: SES_Send-Emails
           PolicyDocument:
@@ -176,6 +181,45 @@ Resources:
 
   # -------------------------------------------
   
+  ElastiCacheHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: handler for ElastiCache events
+      FunctionName: Handle_ElastiCache
+      Handler: handlers/Handle_ElastiCache.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 10
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+
+  ElastiCacheReceiver:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Receive_ElastiCache
+      Subscription:
+        - Protocol: lambda
+          Endpoint:
+            Fn::GetAtt:
+              - ElastiCacheHandler
+              - Arn
+
+  ElastiCachePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref ElastiCacheReceiver
+      FunctionName:
+        Fn::GetAtt:
+          - ElastiCacheHandler
+          - Arn
+
+  # -------------------------------------------
+  
   SlackNotifier:
     Type: AWS::Lambda::Function
     Properties:
@@ -211,3 +255,21 @@ Resources:
       Environment:
         Variables:
           SenderEmailAddress: !Ref EmailSenderAddress
+          
+  PhoneTextNotifier:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: notifier for SMS texts
+      FunctionName: Notify_Phone_Text
+      Handler: notifiers/Notify_Phone_Text.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 20
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Environment:
+        Variables:
+          SenderPhoneID: !Ref SenderPhoneID

@@ -9,4 +9,7 @@ aws cloudformation package --template-file stack.yaml --output-template-file sta
 
 # deploy the stack
 aws cloudformation deploy --template-file stack.new.yaml --stack-name AWS-Events --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides SlackURL="$SLACK_URL" EmailSenderAddress="$EMAIL_SENDER"
+  --parameter-overrides \
+    SlackURL="$SLACK_URL" \
+    EmailSenderAddress="$EMAIL_SENDER" \
+    SenderPhoneID="$PHONE_SENDER"
