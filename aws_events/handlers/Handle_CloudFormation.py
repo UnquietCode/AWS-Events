@@ -24,9 +24,10 @@ def handler(event, context):
         return
 
     status = message_data['ResourceStatus']
+    stack_name = message_data['StackName']
     
     message = "Stack '{}' has entered state '{}'.".format(
-        message_data['LogicalResourceId'],
+        stack_name,
         status,
     )
 
@@ -36,6 +37,7 @@ def handler(event, context):
         message=message,
         data={
             'status': status,
+            'stack_name': stack_name,
             'details': message_data,
         }
     )

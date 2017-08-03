@@ -220,6 +220,45 @@ Resources:
 
   # -------------------------------------------
   
+  ElasticBeanstalkHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: handler for ElasticBeanstalk events
+      FunctionName: Handle_ElasticBeanstalk
+      Handler: handlers/Handle_ElasticBeanstalk.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 15
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+
+  ElasticBeanstalkReceiver:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: Receive_ElasticBeanstalk
+      Subscription:
+        - Protocol: lambda
+          Endpoint:
+            Fn::GetAtt:
+              - ElasticBeanstalkHandler
+              - Arn
+
+  ElasticBeanstalkPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref ElasticBeanstalkReceiver
+      FunctionName:
+        Fn::GetAtt:
+          - ElasticBeanstalkHandler
+          - Arn
+
+  # -------------------------------------------
+  
   SlackNotifier:
     Type: AWS::Lambda::Function
     Properties:

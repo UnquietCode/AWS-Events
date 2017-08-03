@@ -12,7 +12,14 @@ def handler(event, context):
     
     eventID = message_data.get('Event ID', '').strip()
     last_hash = eventID.rfind('#')
-    event_name = eventID[last_hash+1:] if last_hash > 0 else '???'
+    event_name = eventID[last_hash+1:] if last_hash > 0 else None
+    
+    # try to make a relevant event name when there is none
+    if event_name is None:
+        if 'The free storage capacity for DB Instance:' in eventID:
+            event_name = 'FreeStorageLow'
+        else:
+            event_name = '???'
     
     subject = "Database Event - {}".format(database_name)
     
