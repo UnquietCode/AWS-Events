@@ -259,6 +259,50 @@ Resources:
 
   # -------------------------------------------
   
+  HealthEventsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: AWS-Events_Health-Events-Rule
+      Description: AWS-Events Health Events Receiver
+      State: ENABLED
+      EventPattern:
+        source:
+          - "aws.health"
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - HealthEventsHandler
+              - Arn
+          Id: !Ref HealthEventsHandler
+        
+  HealthEventsHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: handler for Personal Health events
+      FunctionName: Handle_HealthEvents
+      Handler: handlers/Handle_HealthEvents.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 10
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+          
+  HealthEventsPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HealthEventsHandler
+      Action: lambda:InvokeFunction
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - HealthEventsRule
+          - Arn
+
+  # -------------------------------------------
+  
   SlackNotifier:
     Type: AWS::Lambda::Function
     Properties:

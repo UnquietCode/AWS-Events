@@ -19,8 +19,11 @@ def notify_channel(channel, name, icon, text, data):
     data = data or {}
     
     for key, value in data.items():
-        data_string = json.dumps(value, indent=2)
-        data_string = "```\n{}\n```".format(data_string)
+        if isinstance(value, dict):
+            data_string = json.dumps(value, indent=2)
+            data_string = "```\n{}\n```".format(data_string)
+        else:
+            data_string = value
         
         attachments.append({
             'title': key,
