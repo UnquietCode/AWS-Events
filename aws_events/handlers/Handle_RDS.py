@@ -16,7 +16,7 @@ def handler(event, context):
     
     # try to make a relevant event name when there is none
     if event_name is None:
-        if 'The free storage capacity for DB Instance:' in eventID:
+        if 'The free storage capacity for DB Instance:' in event_message:
             event_name = 'FreeStorageLow'
         else:
             event_name = '???'
@@ -29,7 +29,7 @@ def handler(event, context):
     )
     
     if eventID:
-        message = message + "\n\nSee {} for more information.".format(eventID)
+        message += "\n\nSee {} for more information.".format(eventID)
 
     publish_event(
         source='RDS',
