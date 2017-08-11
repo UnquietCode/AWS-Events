@@ -1,10 +1,11 @@
 #!/bin/bash
 set -ex
 
-export AWS_DEFAULT_PROFILE=prod
+# use this optionally to override the [default] profile
+#export AWS_DEFAULT_PROFILE=""
 
-export S3_BUCKET="fabric-ops"
-export S3_PREFIX="aws-events"
-export SLACK_URL="https://hooks.slack.com/services/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"
-export EMAIL_SENDER="ops@fabricgenomics.com"
+export S3_BUCKET=""
+export S3_PREFIX=""
+export SLACK_URL=""
+export EMAIL_SENDER=""
 export PHONE_SENDER=""
