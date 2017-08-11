@@ -267,6 +267,23 @@ Resources:
           - Arn
 
   # -------------------------------------------
+        
+  CloudWatchEventsHandler:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: handler for AWS CloudWatch Events
+      FunctionName: Handle_CloudWatchEvents
+      Handler: handlers/Handle_CloudWatchEvents.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 10
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+  
+  # -------------------------------------------
   
   HealthEventsRule:
     Type: AWS::Events::Rule
@@ -278,31 +295,16 @@ Resources:
         source:
           - aws.health
       Targets:
-        - Id: !Ref HealthEventsHandler
+        - Id: HealthEventsHandler
           Arn:
             Fn::GetAtt:
-              - HealthEventsHandler
+              - CloudWatchEventsHandler
               - Arn
-        
-  HealthEventsHandler:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code: aws_events/
-      Description: handler for Personal Health events
-      FunctionName: Handle_HealthEvents
-      Handler: handlers/Handle_HealthEvents.handler
-      Runtime: python3.6
-      MemorySize: 128
-      Timeout: 10
-      Role:
-        Fn::GetAtt:
-          - LambdaExecutionRole
-          - Arn
           
   HealthEventsPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref HealthEventsHandler
+      FunctionName: !Ref CloudWatchEventsHandler
       Action: lambda:InvokeFunction
       Principal: "events.amazonaws.com"
       SourceArn:
@@ -325,31 +327,16 @@ Resources:
           - ECS Task State Change
           - ECS Container Instance State Change
       Targets:
-        - Id: !Ref ECSEventsHandler
+        - Id: ECSEventsHandler
           Arn:
             Fn::GetAtt:
-              - ECSEventsHandler
+              - CloudWatchEventsHandler
               - Arn
 
-  ECSEventsHandler:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code: aws_events/
-      Description: handler for ECS events
-      FunctionName: Handle_ECS
-      Handler: handlers/Handle_ECS.handler
-      Runtime: python3.6
-      MemorySize: 128
-      Timeout: 10
-      Role:
-        Fn::GetAtt:
-          - LambdaExecutionRole
-          - Arn
-          
   ECSEventsPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref ECSEventsHandler
+      FunctionName: !Ref CloudWatchEventsHandler
       Action: lambda:InvokeFunction
       Principal: "events.amazonaws.com"
       SourceArn:
