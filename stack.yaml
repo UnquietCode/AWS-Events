@@ -39,6 +39,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
+        
         - PolicyName: SNS_Publish-Events
           PolicyDocument:
             Version: "2012-10-17"
@@ -55,6 +56,14 @@ Resources:
               Action:
                 - SES:SendEmail
                 - SES:SendRawEmail
+              Resource: '*'
+              
+        - PolicyName: CloudWatch_Publish-Events
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Effect: Allow
+              Action: events:PutEvents
               Resource: '*'
 
   EventsReceiver:
@@ -269,11 +278,11 @@ Resources:
         source:
           - aws.health
       Targets:
-        - Arn:
+        - Id: !Ref HealthEventsHandler
+          Arn:
             Fn::GetAtt:
               - HealthEventsHandler
               - Arn
-          Id: !Ref HealthEventsHandler
         
   HealthEventsHandler:
     Type: AWS::Lambda::Function
@@ -316,12 +325,12 @@ Resources:
           - ECS Task State Change
           - ECS Container Instance State Change
       Targets:
-        - Arn:
+        - Id: !Ref ECSEventsHandler
+          Arn:
             Fn::GetAtt:
               - ECSEventsHandler
               - Arn
-          Id: !Ref ECSEventsHandler
-        
+
   ECSEventsHandler:
     Type: AWS::Lambda::Function
     Properties:
@@ -349,6 +358,21 @@ Resources:
           - Arn
 
   # -------------------------------------------
+
+  CloudWatchEventsNotifier:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: aws_events/
+      Description: notifier for CloudWatch Events
+      FunctionName: Notify_CloudWatchEvents
+      Handler: notifiers/Notify_CloudWatchEvents.handler
+      Runtime: python3.6
+      MemorySize: 128
+      Timeout: 15
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
   
   SlackNotifier:
     Type: AWS::Lambda::Function
